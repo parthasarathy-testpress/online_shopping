@@ -6,6 +6,11 @@ import csv
 import datetime
 from django.http import HttpResponse
 
+@admin.action(description="Invoice")
+def order_pdf(obj):
+    url = reverse("orders:admin_order_pdf", args=[obj.id])
+    return mark_safe(f'<a href="{url}">PDF</a>')
+
 @admin.action(description="Export to CSV")
 def export_to_csv(modeladmin, request, queryset):
     opts = modeladmin.model._meta
@@ -54,7 +59,8 @@ class OrderAdmin(admin.ModelAdmin):
         "paid",
         "created",
         "updated",
-        order_detail
+        order_detail,
+        order_pdf
     ]
     list_filter = ["paid", "created", "updated"]
     inlines = [OrderItemInline]
