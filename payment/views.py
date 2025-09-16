@@ -6,6 +6,7 @@ from orders.models import Order
 # instantiate Braintree payment gateway
 gateway = braintree.BraintreeGateway(settings.BRAINTREE_CONF)
 
+from .tasks import payment_completed
 
 def payment_process(request):
     order_id = request.session.get("order_id")
@@ -28,6 +29,7 @@ def payment_process(request):
             # store the unique transaction id
             order.braintree_id = result.transaction.id
             order.save()
+            payment_completed.delay(order.pk) # type: ignore
             return redirect("payment:done")
         else:
             return redirect("payment:canceled")
