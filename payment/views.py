@@ -30,6 +30,7 @@ def payment_process(request):
             order.braintree_id = result.transaction.id
             order.save()
             payment_completed.delay(order.pk) # type: ignore
+            request.session["coupon_id"] = None
             return redirect("payment:done")
         else:
             return redirect("payment:canceled")
